@@ -8,78 +8,108 @@ class PantallaGestionRegistroResultadoRevisionManual(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        self.master.title("Registrar Resultado de Revisión Manual (CU-23)")
+        self.master.title("Sistema de Red Sísmica")
         self.master.geometry("900x700")
         self.pack(fill="both", expand=True)
+
         self.gestor = GestorRegistroResultadoRevisionManual(self)
-        self.crear_widgets()
+        self.sismo_seleccionado_id = None
+
+        self.vista_menu = tk.Frame(self)
+        self.vista_lista = tk.Frame(self)
+        self.vista_detalle = tk.Frame(self)
+
+        for frame in (self.vista_menu, self.vista_lista, self.vista_detalle):
+            frame.grid(row=0, column=0, sticky='nsew')
+        
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        self._crear_widgets_menu()
+        self._crear_widgets_lista()
+        self._crear_widgets_detalle()
+
         self.habilitarVentana()
 
-    def crear_widgets(self):
-        frame_lista = tk.LabelFrame(self, text="Paso 1: Seleccionar Opción y Evento a Revisar")
-        frame_lista.pack(pady=10, padx=10, fill="x")
-        
-        self.btn_buscar = tk.Button(frame_lista, text="Registrar Resultado de Revisión Manual", command=self.opcion_registrar_resultado)
-        self.btn_buscar.pack(pady=5)
-        
+    def _mostrar_vista(self, vista_a_mostrar):
+        if vista_a_mostrar == 'menu':
+            self.master.title("Menú Principal")
+            self.vista_menu.tkraise()
+        elif vista_a_mostrar == 'lista':
+            self.master.title("Selección de Evento Sísmico")
+            self.vista_lista.tkraise()
+        elif vista_a_mostrar == 'detalle':
+            self.master.title(f"Revisión del Evento: {self.sismo_seleccionado_id}")
+            self.vista_detalle.tkraise()
+
+    def _crear_widgets_menu(self):
+        label = ttk.Label(self.vista_menu, text="Menú Principal", font=("Helvetica", 16, "bold"))
+        label.pack(pady=20)
+        btn_registrar = ttk.Button(self.vista_menu, text="Registrar Resultado de Revisión Manual", command=self.opcion_registrar_resultado)
+        btn_registrar.pack(pady=10, padx=50, ipady=10, fill="x")
+
+    def _crear_widgets_lista(self):
+        frame_lista = ttk.LabelFrame(self.vista_lista, text="Sismos No Revisados")
+        frame_lista.pack(pady=10, padx=10, fill="both", expand=True)
         self.tree_sismos = ttk.Treeview(frame_lista, columns=("ID", "Fecha", "Magnitud", "Estado"), show="headings")
         self.tree_sismos.heading("ID", text="ID"); self.tree_sismos.heading("Fecha", text="Fecha/Hora"); self.tree_sismos.heading("Magnitud", text="Magnitud"); self.tree_sismos.heading("Estado", text="Estado Actual")
-        self.tree_sismos.pack(pady=5, padx=5, fill="x")
+        self.tree_sismos.pack(pady=5, padx=5, fill="both", expand=True)
         self.tree_sismos.bind("<<TreeviewSelect>>", self.on_sismo_select)
+        frame_botones = ttk.Frame(self.vista_lista)
+        frame_botones.pack(pady=10, padx=10, fill="x")
+        self.btn_seleccionar = ttk.Button(frame_botones, text="Seleccionar Sismo", state="disabled", command=self.tomarSeleccionEventoSismico)
+        self.btn_seleccionar.pack(side="right", padx=5)
+        btn_volver = ttk.Button(frame_botones, text="Volver al Menú", command=lambda: self._mostrar_vista('menu'))
+        btn_volver.pack(side="left", padx=5)
 
-        frame_detalles = tk.LabelFrame(self, text="Paso 2: Visualizar Datos del Evento Seleccionado")
+    def _crear_widgets_detalle(self):
+        frame_detalles = ttk.LabelFrame(self.vista_detalle, text="Detalles del Evento y Acciones")
         frame_detalles.pack(pady=10, padx=10, fill="both", expand=True)
-        self.lbl_detalles = tk.Label(frame_detalles, text="Seleccione un sismo de la lista para comenzar.", justify=tk.LEFT, anchor="nw")
-        self.lbl_detalles.pack(pady=5, padx=5, fill="both", expand=True)
-        
-        frame_acciones = tk.LabelFrame(self, text="Paso 3: Tomar una Acción")
-        frame_acciones.pack(pady=10, padx=10, fill="x")
-
-        self.btn_ver_mapa = tk.Button(frame_acciones, text="Visualizar Mapa", state="disabled")
-        self.btn_ver_mapa.pack(side="left", padx=5, pady=5)
-        self.btn_modificar = tk.Button(frame_acciones, text="Modificar Datos", state="disabled")
-        self.btn_modificar.pack(side="left", padx=5, pady=5)
-
-        self.btn_confirmar = tk.Button(frame_acciones, text="Confirmar Evento", state="disabled")
+        self.lbl_detalles = ttk.Label(frame_detalles, text="", font=("Helvetica", 10), justify=tk.LEFT, anchor="nw")
+        self.lbl_detalles.pack(pady=10, padx=10, fill="both", expand=True)
+        self.frame_acciones = ttk.LabelFrame(self.vista_detalle, text="Tomar una Acción")
+        self.frame_acciones.pack(pady=10, padx=10, fill="x")
+        self.btn_confirmar = ttk.Button(self.frame_acciones, text="Confirmar Evento")
         self.btn_confirmar.pack(side="right", padx=5, pady=5)
-        self.btn_rechazar = tk.Button(frame_acciones, text="Rechazar Evento", state="disabled", command=self.tomarSeleccionRechazo)
+        self.btn_rechazar = ttk.Button(self.frame_acciones, text="Rechazar Evento", command=self.tomarSeleccionRechazo)
         self.btn_rechazar.pack(side="right", padx=5, pady=5)
-        self.btn_derivar = tk.Button(frame_acciones, text="Solicitar Revisión a Experto", state="disabled")
+        self.btn_derivar = ttk.Button(self.frame_acciones, text="Solicitar Revisión a Experto")
         self.btn_derivar.pack(side="right", padx=5, pady=5)
-
+        btn_volver = ttk.Button(self.vista_detalle, text="Volver a la Lista", command=lambda: self._mostrar_vista('lista'))
+        btn_volver.pack(pady=10)
 
     def habilitarVentana(self):
-        print("\n** PANTALLA: Ventana habilitada. **")
-        messagebox.showinfo("Inicio", "Bienvenido. Por favor, seleccione la opción para registrar un resultado.")
+        self._mostrar_vista('menu')
+        messagebox.showinfo("Inicio", "Bienvenido al Sistema de Red Sísmica.")
 
     def opcion_registrar_resultado(self):
-        print("\n** PANTALLA: (CU-23 P.5) Actor seleccionó la opción. Buscando sismos... **")
-        self.solicitarSeleccionEventoSismico()
-        self.btn_buscar.config(state="disabled")
-
-    def solicitarSeleccionEventoSismico(self):
         self.gestor.buscarSismosAutoDetectadosYPendienteDeRevision()
 
     def mostrarEventosSismicosEncontradosOrdenados(self, lista_sismos):
-        print("** PANTALLA: (CU-23 P.6) Mostrando sismos no revisados. Por favor, seleccione uno. **")
+        print("** PANTALLA: El Gestor me ordenó mostrar los sismos. **")
+        self.btn_seleccionar.config(state="disabled")
         for i in self.tree_sismos.get_children(): self.tree_sismos.delete(i)
         for sismo in lista_sismos:
-            estado_nombre = sismo.estadoActual.actual.nombre
-            self.tree_sismos.insert("", "end", values=(sismo.id_sismo, sismo.fechaHoraOcurrencia.strftime("%Y-%m-%d %H:%M"), sismo.valorMagnitud, estado_nombre))
+            self.tree_sismos.insert("", "end", values=(sismo.id_sismo, sismo.fechaHoraOcurrencia.strftime("%Y-%m-%d %H:%M"), sismo.valorMagnitud, sismo.estadoActual.actual.nombre))
+        self._mostrar_vista('lista')
 
+    def solicitarSeleccionEventoSismico(self):
+        print("** PANTALLA: El Gestor me ordenó solicitar una selección. **")
+        messagebox.showinfo("Siguiente Paso", "Se encontraron sismos. Por favor, seleccione uno y presione 'Seleccionar Sismo'.")
+        
     def on_sismo_select(self, event):
         selected_item = self.tree_sismos.selection()
         if selected_item:
-            sismo_id = self.tree_sismos.item(selected_item)['values'][0]
-            self.tomarSeleccionEventoSismico(sismo_id)
+            self.sismo_seleccionado_id = self.tree_sismos.item(selected_item)['values'][0]
+            self.btn_seleccionar.config(state="normal")
 
-    def tomarSeleccionEventoSismico(self, sismo_id):
-        print(f"\n** PANTALLA: (CU-23 P.7) Se tomó la selección del sismo ID: {sismo_id} **")
-        self.tree_sismos.config(selectmode="none")
-        self.gestor.tomarSeleccionEventoSismico(sismo_id)
+    def tomarSeleccionEventoSismico(self):
+        if self.sismo_seleccionado_id:
+            self.gestor.tomarSeleccionEventoSismico(self.sismo_seleccionado_id)
 
-    def mostrarDatosEventoSismicoSeleccionado(self, sismo):
-        print(f"** PANTALLA: (CU-23 P.9) Mostrando datos del sismo {sismo.id_sismo} **")
+    def mostrarDatosYContinuarFlujo(self, sismo):
+        # MÉTODO LLAMADO POR EL GESTOR una vez que tiene los datos
+        print(f"** PANTALLA: Mostrando detalles del sismo {sismo.id_sismo} **")
         sismo_info = sismo.getDatosEventoSismico()
         texto = (
             f"ID: {sismo_info['ID']}\n"
@@ -89,32 +119,42 @@ class PantallaGestionRegistroResultadoRevisionManual(tk.Frame):
             f"--- Detalles Adicionales ---\n"
             f"Alcance: {sismo.getAlcance()}\n"
             f"Clasificación: {sismo.getClasificacion()}\n"
-            f"Origen: {sismo.getOrigen()}\n\n"
-            f"Sismograma generado. (CU-23 P.9.3)"
+            f"Origen: {sismo.getOrigen()}\n"
         )
         self.lbl_detalles.config(text=texto)
+        self._mostrar_vista('detalle')
 
-    def habilitarOpcionesDeRevision(self):
-        print("** PANTALLA: (CU-23 P.10, 12, 14) Habilitando opciones de revisión. **")
-        self.btn_ver_mapa.config(state="normal")
-        self.btn_modificar.config(state="normal")
-        self.btn_confirmar.config(state="normal")
-        self.btn_rechazar.config(state="normal")
-        self.btn_derivar.config(state="normal")
-        messagebox.showinfo("Siguiente Paso", "Se han cargado los datos del sismo. Por favor, seleccione una acción a realizar.")
+        # --- NUEVO FLUJO INTERACTIVO ---
+        self.tomarSeleccionDeNoVisualizacionMapa()
 
+    def tomarSeleccionDeNoVisualizacionMapa(self):
+        # Paso 10 y 11 del CU
+        if not messagebox.askyesno("Visualizar Mapa", "¿Desea visualizar en mapa el evento?"):
+            print("** PANTALLA: Usuario seleccionó NO visualizar el mapa. **")
+            self.consultarModificacionDatos()
+        # else: aquí iría la lógica si el usuario dice que sí
+
+    def consultarModificacionDatos(self):
+        # Paso 12 y 13 del CU
+        if not messagebox.askyesno("Modificar Datos", "¿Desea modificar los datos del evento sísmico?"):
+            print("** PANTALLA: Usuario seleccionó NO modificar datos. **")
+            self.gestor.solicitarConfirmacionDeRevision()
+        # else: aquí iría la lógica para la modificación
+
+    def solicitarConfirmarRechazarRevisarEvento(self):
+        # MÉTODO LLAMADO POR EL GESTOR
+        print("** PANTALLA: El Gestor me ordenó habilitar las opciones finales. **")
+        # Ocultamos el frame de acciones y lo volvemos a mostrar para asegurar el orden
+        self.frame_acciones.pack_forget()
+        self.frame_acciones.pack(pady=10, padx=10, fill="x")
+        messagebox.showinfo("Acción Requerida", "Por favor, seleccione una acción final para el evento.")
+        
     def tomarSeleccionRechazo(self):
-        print("** PANTALLA: (CU-23 P.15) Usuario seleccionó RECHAZAR. **")
-        if messagebox.askyesno("Confirmar Rechazo", "¿Está seguro de que desea RECHAZAR la revisión de este evento sísmico?"):
+        # Paso 15 del CU
+        if messagebox.askyesno("Confirmar Rechazo", "¿Está seguro de que desea RECHAZAR la revisión?"):
             self.gestor.tomarSeleccionRechazo()
-        else:
-            print("** PANTALLA: El usuario canceló el rechazo. **")
 
     def finCU(self):
-        messagebox.showinfo("Proceso Finalizado", "El evento ha sido marcado como 'Rechazado'. La interfaz se reiniciará.")
-        self.lbl_detalles.config(text="Seleccione un sismo de la lista para comenzar.")
-        for btn in [self.btn_ver_mapa, self.btn_modificar, self.btn_confirmar, self.btn_rechazar, self.btn_derivar, self.btn_buscar]:
-            btn.config(state="disabled")
-        self.tree_sismos.config(selectmode="browse")
-        self.btn_buscar.config(state="normal")
-        self.gestor.buscarSismosAutoDetectadosYPendienteDeRevision()
+        # MÉTODO LLAMADO POR EL GESTOR
+        messagebox.showinfo("Proceso Finalizado", "El evento ha sido procesado. Volviendo a la lista de sismos.")
+        self._mostrar_vista('lista')

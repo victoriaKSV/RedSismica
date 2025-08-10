@@ -1,6 +1,6 @@
 class SerieTemporal:
-    def getDatos(self):
-        print("-> SerieTemporal: Obteniendo datos")
+    def __init__(self):
+        self.muestras = []
 
-    def getValoresAlcanzadosPorCadaInstanteDeTiempo(self):
-        print("-> SerieTemporal: Obteniendo valores por instante de tiempo")
+    def agregar_muestra(self, muestra):
+        self.muestras.append(muestra)
