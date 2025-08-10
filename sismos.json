@@ -1,0 +1,22 @@
+[
+    {
+        "id_sismo": "AR-2025-001",
+        "fecha_hora_ocurrencia": "2025-07-15T10:30:55.123456",
+        "valor_magnitud": 4.8,
+        "latitud_epicentro": "-31.3456",
+        "longitud_epicentro": "-64.2345",
+        "latitud_hipocentro": "-31.3556",
+        "longitud_hipocentro": "-64.2445",
+        "estado_inicial": "Auto-Detectado"
+    },
+    {
+        "id_sismo": "AR-2025-002",
+        "fecha_hora_ocurrencia": "2025-08-01T22:15:10.987654",
+        "valor_magnitud": 5.2,
+        "latitud_epicentro": "-31.8123",
+        "longitud_epicentro": "-63.9876",
+        "latitud_hipocentro": "-31.8223",
+        "longitud_hipocentro": "-63.9976",
+        "estado_inicial": "Pendiente de Revisión"
+    }
+]
