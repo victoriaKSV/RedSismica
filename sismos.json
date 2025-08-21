@@ -1,159 +1,119 @@
-
 [
-    {
-        "id_sismo": "AR-2025-001",
-        "fecha_hora_ocurrencia": "2025-08-01T14:30:00.000000",
-        "valor_magnitud": 5.2,
-        "estado_inicial": "Auto-Detectado",
-        "series_temporales": [
-            {
-                "muestras": [
-                    {
-                        "fecha_hora_muestra": "2025-08-01T14:30:00.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": 0.31 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 2.1 },
-                            { "tipo_dato": "longitud_onda", "valor": 0.15 }
-                        ]
-                    },
-                    {
-                        "fecha_hora_muestra": "2025-08-01T14:30:01.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": 1.15 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 2.3 },
-                            { "tipo_dato": "longitud_onda", "valor": 0.50 }
-                        ]
-                    },
-                    {
-                        "fecha_hora_muestra": "2025-08-01T14:30:02.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": 8.75 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 1.8 },
-                            { "tipo_dato": "longitud_onda", "valor": 4.86 }
-                        ]
-                    },
-                    {
-                        "fecha_hora_muestra": "2025-08-01T14:30:03.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": 4.20 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 2.0 },
-                            { "tipo_dato": "longitud_onda", "valor": 2.10 }
-                        ]
-                    },
-                    {
-                        "fecha_hora_muestra": "2025-08-01T14:30:04.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": -2.50 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 2.2 },
-                            { "tipo_dato": "longitud_onda", "valor": -1.14 }
-                        ]
-                    },
-                    {
-                        "fecha_hora_muestra": "2025-08-01T14:30:05.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": 0.45 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 2.1 },
-                            { "tipo_dato": "longitud_onda", "valor": 0.21 }
-                        ]
-                    }
-                ]
-            }
+  {
+    "id_sismo": "SIS001",
+    "fecha_hora_ocurrencia": "2025-08-20T14:30:00",
+    "valor_magnitud": 4.5,
+    "estado_inicial": "Auto-Detectado",
+    "latitud_epicentro": -31.4201,
+    "longitud_epicentro": -64.1888,
+    "profundidad": 35.5,
+    "series_temporales": [
+      {
+        "muestras": [
+          {
+            "fecha_hora_muestra": "2025-08-20T14:30:00",
+            "detalles": [
+              {"tipo_dato": "velocidad_onda", "valor": 3.2},
+              {"tipo_dato": "frecuencia_onda", "valor": 15.5},
+              {"tipo_dato": "longitud_onda", "valor": 200}
+            ]
+          },
+          {
+            "fecha_hora_muestra": "2025-08-20T14:30:05",
+            "detalles": [
+              {"tipo_dato": "velocidad_onda", "valor": 4.1},
+              {"tipo_dato": "frecuencia_onda", "valor": 18.2},
+              {"tipo_dato": "longitud_onda", "valor": 180}
+            ]
+          },
+          {
+            "fecha_hora_muestra": "2025-08-20T14:30:10",
+            "detalles": [
+              {"tipo_dato": "velocidad_onda", "valor": 2.8},
+              {"tipo_dato": "frecuencia_onda", "valor": 12.3},
+              {"tipo_dato": "longitud_onda", "valor": 210}
+            ]
+          }
         ]
-    },
-    {
-        "id_sismo": "AR-2025-002",
-        "fecha_hora_ocurrencia": "2025-07-25T08:15:10.000000",
-        "valor_magnitud": 4.1,
-        "estado_inicial": "Pendiente de Revisión",
-        "series_temporales": [
-            {
-                "muestras": [
-                    {
-                        "fecha_hora_muestra": "2025-07-25T08:15:10.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": -0.12 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 3.5 },
-                            { "tipo_dato": "longitud_onda", "valor": -0.03 }
-                        ]
-                    },
-                    {
-                        "fecha_hora_muestra": "2025-07-25T08:15:11.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": 3.20 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 3.1 },
-                            { "tipo_dato": "longitud_onda", "valor": 1.03 }
-                        ]
-                    },
-                    {
-                        "fecha_hora_muestra": "2025-07-25T08:15:12.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": 1.50 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 2.9 },
-                            { "tipo_dato": "longitud_onda", "valor": 0.52 }
-                        ]
-                    },
-                    {
-                        "fecha_hora_muestra": "2025-07-25T08:15:13.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": -0.95 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 3.3 },
-                            { "tipo_dato": "longitud_onda", "valor": -0.29 }
-                        ]
-                    }
-                ]
-            }
+      }
+    ]
+  },
+  {
+    "id_sismo": "SIS002",
+    "fecha_hora_ocurrencia": "2025-08-19T09:15:00",
+    "valor_magnitud": 3.2,
+    "estado_inicial": "Pendiente de Revisión",
+    "series_temporales": [
+      {
+        "muestras": [
+          {
+            "fecha_hora_muestra": "2025-08-19T09:15:00",
+            "detalles": [
+              {"tipo_dato": "velocidad_onda", "valor": 2.5},
+              {"tipo_dato": "frecuencia_onda", "valor": 10.5},
+              {"tipo_dato": "longitud_onda", "valor": 250}
+            ]
+          },
+          {
+            "fecha_hora_muestra": "2025-08-19T09:15:05",
+            "detalles": [
+              {"tipo_dato": "velocidad_onda", "valor": 3.0},
+              {"tipo_dato": "frecuencia_onda", "valor": 12.8},
+              {"tipo_dato": "longitud_onda", "valor": 230}
+            ]
+          }
         ]
-    },
-    {
-        "id_sismo": "AR-2025-003",
-        "fecha_hora_ocurrencia": "2025-08-09T19:55:40.000000",
-        "valor_magnitud": 6.3,
-        "estado_inicial": "Auto-Detectado",
-        "series_temporales": [
-            {
-                "muestras": [
-                    {
-                        "fecha_hora_muestra": "2025-08-09T19:55:40.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": 0.88 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 1.2 },
-                            { "tipo_dato": "longitud_onda", "valor": 0.73 }
-                        ]
-                    },
-                    {
-                        "fecha_hora_muestra": "2025-08-09T19:55:41.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": -5.40 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 1.1 },
-                            { "tipo_dato": "longitud_onda", "valor": -4.91 }
-                        ]
-                    },
-                    {
-                        "fecha_hora_muestra": "2025-08-09T19:55:42.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": 12.10 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 0.9 },
-                            { "tipo_dato": "longitud_onda", "valor": 13.44 }
-                        ]
-                    },
-                    {
-                        "fecha_hora_muestra": "2025-08-09T19:55:43.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": -9.80 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 1.0 },
-                            { "tipo_dato": "longitud_onda", "valor": -9.80 }
-                        ]
-                    },
-                    {
-                        "fecha_hora_muestra": "2025-08-09T19:55:44.000000",
-                        "detalles": [
-                            { "tipo_dato": "velocidad_onda", "valor": 2.30 },
-                            { "tipo_dato": "frecuencia_onda", "valor": 1.3 },
-                            { "tipo_dato": "longitud_onda", "valor": 1.77 }
-                        ]
-                    }
-                ]
-            }
+      }
+    ]
+  },
+  {
+    "id_sismo": "SIS003",
+    "fecha_hora_ocurrencia": "2025-08-18T22:45:00",
+    "valor_magnitud": 5.1,
+    "estado_inicial": "Auto-Detectado",
+    "series_temporales": [
+      {
+        "muestras": [
+          {
+            "fecha_hora_muestra": "2025-08-18T22:45:00",
+            "detalles": [
+              {"tipo_dato": "velocidad_onda", "valor": 5.2},
+              {"tipo_dato": "frecuencia_onda", "valor": 22.5},
+              {"tipo_dato": "longitud_onda", "valor": 150}
+            ]
+          },
+          {
+            "fecha_hora_muestra": "2025-08-18T22:45:05",
+            "detalles": [
+              {"tipo_dato": "velocidad_onda", "valor": 6.1},
+              {"tipo_dato": "frecuencia_onda", "valor": 25.3},
+              {"tipo_dato": "longitud_onda", "valor": 140}
+            ]
+          },
+          {
+            "fecha_hora_muestra": "2025-08-18T22:45:10",
+            "detalles": [
+              {"tipo_dato": "velocidad_onda", "valor": 4.8},
+              {"tipo_dato": "frecuencia_onda", "valor": 20.1},
+              {"tipo_dato": "longitud_onda", "valor": 160}
+            ]
+          }
         ]
-    }
+      }
+    ]
+  },
+  {
+    "id_sismo": "SIS004",
+    "fecha_hora_ocurrencia": "2025-08-17T16:20:00",
+    "valor_magnitud": 2.8,
+    "estado_inicial": "Rechazado",
+    "series_temporales": []
+  },
+  {
+    "id_sismo": "SIS005",
+    "fecha_hora_ocurrencia": "2025-08-16T11:00:00",
+    "valor_magnitud": 3.9,
+    "estado_inicial": "Confirmado",
+    "series_temporales": []
+  }
 ]
