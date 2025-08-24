@@ -17,39 +17,60 @@ class CambioEstado:
         return cls(estado)
 
     def esEstadoActual(self) -> bool:
-        """Verifica si este es el estado actual (sin fecha de fin)"""
+        """
+        CORRECCIÓN: Verifica si este es el estado actual (sin fecha de fin)
+        SEGÚN ANOTACIONES PDF: "Con el método esEstadoActual() en CambioEstado verificamos 
+        si ese estado está vigente (osea si fechaHoraFin esta en None)"
+        """
         resultado = self.fechaHoraFin is None
-        print(f"-> CambioEstado: esEstadoActual() = {resultado}")
+        print(f"-> CambioEstado: esEstadoActual() = {resultado} (fechaHoraFin: {self.fechaHoraFin})")
+        return resultado
+
+    def esAutoDetectado(self) -> bool:
+        """
+        CORRECCIÓN: Verifica si el estado es 'Auto-Detectado'
+        SEGÚN DIAGRAMA: estadoActual:CambioEstado → actual:Estado: esAutoDetectado()
+        """
+        print(f"-> CambioEstado: Delegando esAutoDetectado() al Estado")
+        resultado = self.actual.esAutoDetectado()
+        print(f"-> CambioEstado: esAutoDetectado() = {resultado}")
         return resultado
 
     def esPendienteDeRevision(self) -> bool:
-        """Verifica si el estado es 'Pendiente de Revisión'"""
+        """
+        CORRECCIÓN: Verifica si el estado es 'Pendiente de Revisión'
+        SEGÚN DIAGRAMA: estadoActual:CambioEstado → actual:Estado: esPendienteDeRevision()
+        SEGÚN ANOTACIONES PDF: "CambioEstado delega a su Estado para que compare su nombreEstado"
+        """
+        print(f"-> CambioEstado: Delegando esPendienteDeRevision() al Estado")
         resultado = self.actual.esPendienteDeRevision()
         print(f"-> CambioEstado: esPendienteDeRevision() = {resultado}")
         
-        # verificar si es del ambito
+        # SEGÚN DIAGRAMA: si es PendienteDeRevision, verificar el ámbito
         if resultado:
+            print(f"-> CambioEstado: Es PendienteDeRevision, verificando ámbito...")
             self.esDelAmbito()
         
         return resultado
 
     def esDelAmbito(self) -> bool:
-        """Verifica si el cambio de estado es del ámbito correcto"""
-        print("-> CambioEstado: Verificando esDelAmbito()")
+        """
+        CORRECCIÓN: Verifica si el cambio de estado es del ámbito correcto
+        SEGÚN DIAGRAMA: estadoActual:CambioEstado → :Estado: esÁmbitoEventoSismico()
+        SEGÚN ANOTACIONES PDF: "se consulta el ámbito desde la clase Estado con esÁmbitoEventoSismico()"
+        """
+        print("-> CambioEstado: esDelAmbito() - Delegando a Estado")
         resultado = self.actual.esAmbitoEventoSismico()
         print(f"-> CambioEstado: esDelAmbito() = {resultado}")
         return resultado
 
-    def esAutoDetectado(self) -> bool:
-        """Verifica si el estado es 'Auto-Detectado'"""
-        resultado = self.actual.esAutoDetectado()
-        print(f"-> CambioEstado: esAutoDetectado() = {resultado}")
-        return resultado
-
     def setFechHoraFin(self):
-        """Establece la fecha y hora de fin del estado"""
+        """
+        CORRECCIÓN: Establece la fecha y hora de fin del estado
+        SEGÚN DIAGRAMA: seleccionado:EventoSismico: → estadoActual:CambioEstado: setFechHoraFin()
+        """
         self.fechaHoraFin = datetime.now()
-        print(f"-> CambioEstado: Establecida FechaHoraFin a {self.fechaHoraFin}")
+        print(f"-> CambioEstado: setFechHoraFin() establecida a {self.fechaHoraFin}")
 
     def getNombreEstado(self) -> str:
         """Obtiene el nombre del estado actual"""

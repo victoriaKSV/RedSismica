@@ -6,18 +6,9 @@ from gestor.gestorRegistroResultadoRevisionManual import GestorRegistroResultado
 
 class PantallaGestionRegistroResultadoRevisionManual(tk.Frame):
     """
-    NOTA DE TARJETA AZUL - Interfaz Principal:
-    ==========================================
-    Esta pantalla maneja tres vistas principales:
-    1. MENÚ PRINCIPAL: Muestra las opciones disponibles
-    2. LISTA DE EVENTOS: Muestra eventos filtrados para revisión
-    3. DETALLE DEL EVENTO: Muestra información completa y opciones de acción
-    
-    El analista sigue este flujo:
-    - Selecciona opción del menú
-    - Ve lista de eventos pendientes
-    - Selecciona un evento
-    - Revisa detalles y toma acción
+    CORRECCIÓN: Implementación fiel al diagrama de secuencia y anotaciones del PDF.
+    SEGÚN ANOTACIONES: "Apenas se runea el main, que muestre el MENU PRINCIPAL directamente, 
+    le quitaría la ventana de bienvenida y el botón de aceptar"
     """
     
     def __init__(self, master=None):
@@ -45,13 +36,11 @@ class PantallaGestionRegistroResultadoRevisionManual(tk.Frame):
         self._crear_widgets_lista()
         self._crear_widgets_detalle()
 
-        # Llamar a habilitarVentana() según el diagrama
+        # SEGÚN DIAGRAMA: :PantallaGestionRegistroResultadoRevisionManual → :PantallaGestionRegistroResultadoRevisionManual (self): habilitarVentana()
         self.habilitarVentana()
 
     def _mostrar_vista(self, vista_a_mostrar):
-        """
-        NOTA: Cambia entre las diferentes vistas de la aplicación
-        """
+        """Cambia entre las diferentes vistas de la aplicación"""
         if vista_a_mostrar == 'menu':
             self.master.title("Menú Principal")
             self.vista_menu.tkraise()
@@ -64,9 +53,9 @@ class PantallaGestionRegistroResultadoRevisionManual(tk.Frame):
 
     def _crear_widgets_menu(self):
         """
-        NOTA DE TARJETA AZUL: 
-        El analista selecciona "REGISTRAR RESULTADO DE REVISION MANUAL"
-        Esta es la opción principal del caso de uso
+        CORRECCIÓN: Menú principal según anotaciones del PDF
+        "Se selecciona el botón registrar resultado de revisión manual
+        Y ahí recien se habilita la ventana de selección de evento sismico"
         """
         label = ttk.Label(self.vista_menu, text="Menú Principal", font=("Helvetica", 16, "bold"))
         label.pack(pady=20)
@@ -79,11 +68,7 @@ class PantallaGestionRegistroResultadoRevisionManual(tk.Frame):
         btn_registrar.pack(pady=10, padx=50, ipady=10, fill="x")
 
     def _crear_widgets_lista(self):
-        """
-        NOTA DE TARJETA VIOLETA:
-        Muestra la lista de eventos sísmicos pendientes de revisión
-        con ID, Fecha/Hora, Magnitud y Estado Actual
-        """
+        """Vista de lista de eventos sísmicos pendientes de revisión"""
         frame_lista = ttk.LabelFrame(self.vista_lista, text="Sismos No Revisados")
         frame_lista.pack(pady=10, padx=10, fill="both", expand=True)
         
@@ -118,9 +103,7 @@ class PantallaGestionRegistroResultadoRevisionManual(tk.Frame):
         btn_volver.pack(side="left", padx=5)
 
     def _crear_widgets_detalle(self):
-        """
-        Vista de detalle con información completa del evento y opciones de acción
-        """
+        """Vista de detalle con información completa del evento y opciones de acción"""
         frame_detalles = ttk.LabelFrame(self.vista_detalle, text="Detalles del Evento y Acciones")
         frame_detalles.pack(pady=10, padx=10, fill="both", expand=True)
         
@@ -166,28 +149,30 @@ class PantallaGestionRegistroResultadoRevisionManual(tk.Frame):
 
     def habilitarVentana(self):
         """
-        Método que habilita la ventana según el diagrama de secuencia
-        Muestra el menú principal al inicio
+        SEGÚN DIAGRAMA: :PantallaGestionRegistroResultadoRevisionManual → :PantallaGestionRegistroResultadoRevisionManual (self): habilitarVentana()
+        SEGÚN ANOTACIONES PDF: "que muestre el MENU PRINCIPAL directamente"
         """
-        print("** PANTALLA: Habilitando ventana principal **")
+        print("** PANTALLA: habilitarVentana() **")
         self._mostrar_vista('menu')
 
     def seleccionarOpcionRegistrarResultadoDeRevisionManual(self):
         """
-        NOTA DE TARJETA AZUL:
-        El analista selecciona la opción "Registrar Resultado de Revisión Manual"
-        desde el menú principal. Esto inicia el caso de uso.
+        SEGÚN DIAGRAMA: :AnalistaEnSismos → :PantallaGestionRegistroResultadoRevisionManual: seleccionarOpciónRegistrarResultadoDeRevisiónManual()
+        LUEGO: :PantallaGestionRegistroResultadoRevisionManual → :GestorRegistroResultradoRevisionManual: buscarSismosAutoDetectradosYPendienteDeRevision()
         """
+        print("** PANTALLA: seleccionarOpcionRegistrarResultadoDeRevisionManual() **")
         print("** PANTALLA: Analista seleccionó 'Registrar Resultado de Revisión Manual' **")
+        
+        # SEGÚN DIAGRAMA: llamar al gestor para buscar sismos
         self.gestor.buscarSismosAutoDetectadosYPendienteDeRevision()
 
     def mostrarEventosSismicosEncontradosOrdenados(self, lista_sismos):
         """
-        NOTA DE TARJETA VIOLETA:
-        Los eventos se muestran ordenados por fecha/hora.
-        Se incluye ID, Fecha/Hora, Magnitud y Estado Actual.
+        SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → :PantallaGestionRegistroResultadoRevisionManual: mostrarEventosSismicosEncontradosOrdenados()
         """
+        print("** PANTALLA: mostrarEventosSismicosEncontradosOrdenados() **")
         print("** PANTALLA: El Gestor me ordenó mostrar los sismos encontrados **")
+        
         self.btn_seleccionar.config(state="disabled")
         
         # Limpiar la tabla
@@ -211,19 +196,18 @@ class PantallaGestionRegistroResultadoRevisionManual(tk.Frame):
 
     def solicitarSeleccionEventoSismico(self):
         """
-        NOTA DE TARJETA AZUL:
-        Solicita al analista que seleccione un evento de la lista.
+        SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → :PantallaGestionRegistroResultadoRevisionManual: solicitarSeleccionEventoSismico()
         """
+        print("** PANTALLA: solicitarSeleccionEventoSismico() **")
         print("** PANTALLA: El Gestor me ordenó solicitar una selección **")
+        
         messagebox.showinfo(
             "Siguiente Paso", 
             "Se encontraron sismos. Por favor, seleccione uno y presione 'Seleccionar Sismo'."
         )
         
     def on_sismo_select(self, event):
-        """
-        Maneja la selección de un sismo en la tabla
-        """
+        """Maneja la selección de un sismo en la tabla"""
         selected_item = self.tree_sismos.selection()
         if selected_item:
             self.sismo_seleccionado_id = self.tree_sismos.item(selected_item)['values'][0]
@@ -231,24 +215,21 @@ class PantallaGestionRegistroResultadoRevisionManual(tk.Frame):
 
     def tomarSeleccionEventoSismico(self):
         """
-        NOTA DE TARJETA AZUL:
-        Envía la selección del evento al gestor.
-        El evento seleccionado será bloqueado para revisión.
+        SEGÚN DIAGRAMA: :AnalistaEnSismos → :PantallaGestionRegistroResultadoRevisionManual: tomarSeleccionEventoSismico()
+        LUEGO: :PantallaGestionRegistroResultadoRevisionManual: → GestorRegistroResultradoRevisionManual: tomarSeleccionEventoSismico()
         """
         if self.sismo_seleccionado_id:
+            print(f"** PANTALLA: tomarSeleccionEventoSismico({self.sismo_seleccionado_id}) **")
             print(f"** PANTALLA: Enviando selección de sismo {self.sismo_seleccionado_id} al gestor **")
+            
+            # SEGÚN DIAGRAMA: enviar selección al gestor
             self.gestor.tomarSeleccionEventoSismico(self.sismo_seleccionado_id)
 
     def mostrarDatosEventoSismicoSeleccionado(self, sismo):
         """
-        NOTA DE TARJETA VIOLETA:
-        Muestra todos los datos del evento sísmico seleccionado:
-        - Información básica (ID, Fecha/Hora, Magnitud)
-        - Coordenadas del epicentro e hipocentro
-        - Alcance, Clasificación y Origen
-        - Estado actual
+        SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → :PantallaGestionRegistroResultadoRevisionManual: mostrarDatosEventoSismicoSeleccionado()
         """
-        print(f"** PANTALLA: Mostrando datos del evento sísmico seleccionado {sismo.id_sismo} **")
+        print(f"** PANTALLA: mostrarDatosEventoSismicoSeleccionado({sismo.id_sismo}) **")
         
         sismo_info = sismo.getDatosEventoSismico()
         texto = (
@@ -272,59 +253,53 @@ class PantallaGestionRegistroResultadoRevisionManual(tk.Frame):
 
     def habilitarOpcionVisualizacionMapaConEstacionesSismologicasInvolucradas(self):
         """
-        NOTA DE TARJETA VIOLETA:
-        Habilita la opción de visualizar el evento en un mapa
-        con las estaciones sismológicas involucradas.
+        SEGÚN DIAGRAMA: GestorRegistroResultradoRevisionManual → :PantallaGestionRegistroResultradoRevisionManual: habilitarOpcionVisualizacionMapaConEstacionesSismologicasInvolucradas()
         """
-        print("** PANTALLA: Habilitando opción de visualización de mapa con estaciones sismológicas **")
+        print("** PANTALLA: habilitarOpcionVisualizacionMapaConEstacionesSismologicasInvolucradas() **")
         
-        # Continuar con el flujo interactivo después del procesamiento
+        # Continuar con el flujo según el diagrama
         self.tomarSeleccionDeNoVisualizacionMapa()
 
     def tomarSeleccionDeNoVisualizacionMapa(self):
         """
-        NOTA DE TARJETA VIOLETA:
-        Gestiona la decisión del usuario sobre visualizar el mapa.
-        Si no desea ver el mapa, continúa con la consulta de modificación.
+        SEGÚN DIAGRAMA: :AnalistaEnSismos → :PantallaGestionRegistroResultradoRevisionManual: tomarSeleccionDeNoVisualizacionMapa()
         """
         print("** PANTALLA: tomarSeleccionDeNoVisualizacionMapa() **")
+        
         if not messagebox.askyesno("Visualizar Mapa", "¿Desea visualizar en mapa el evento?"):
             print("** PANTALLA: Usuario seleccionó NO visualizar el mapa **")
             self.consultarModificacionDatos()
         else:
-            # NOTA: Aquí iría la lógica para mostrar el mapa
             print("** PANTALLA: Usuario desea ver el mapa (funcionalidad no implementada) **")
             self.consultarModificacionDatos()
 
     def consultarModificacionDatos(self):
         """
-        NOTA DE TARJETA VIOLETA:
-        Consulta si el usuario desea modificar los datos del evento.
+        SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → :PantallaGestionRegistroResultradoRevisionManual: consultarModificacionDatos()
         """
         print("** PANTALLA: consultarModificacionDatos() **")
+        
         if not messagebox.askyesno("Modificar Datos", "¿Desea modificar los datos del evento sísmico?"):
             print("** PANTALLA: Usuario seleccionó NO modificar datos **")
             self.tomarSeleccionDeNoModificacion()
         else:
-            # NOTA: Aquí iría la lógica para la modificación
             print("** PANTALLA: Usuario desea modificar datos (funcionalidad no implementada) **")
             self.tomarSeleccionDeNoModificacion()
 
     def tomarSeleccionDeNoModificacion(self):
         """
-        Procesar selección de no modificación según el diagrama
+        SEGÚN DIAGRAMA: :AnalistaEnSismos → :PantallaGestionRegistroResultradoRevisionManual: tomarSeleccionDeNoModificacion()
         """
         print("** PANTALLA: tomarSeleccionDeNoModificacion() **")
+        
+        # Continuar con la solicitud de confirmación según el diagrama
         self.gestor.solicitarConfirmacionDeRevision()
 
     def solicitarConfirmarRechazarRevisarEvento(self):
         """
-        NOTA DE TARJETA VIOLETA:
-        Muestra las opciones finales para el evento:
-        - Confirmar: Valida el evento como sismo real
-        - Rechazar: Marca como falso positivo
-        - Derivar: Solicita revisión de experto
+        SEGÚN DIAGRAMA: GestorRegistroResultradoRevisionManual → :PantallaGestionRegistroResultradoRevisionManual: solicitarConfirmarRechazarRevisarEvento()
         """
+        print("** PANTALLA: solicitarConfirmarRechazarRevisarEvento() **")
         print("** PANTALLA: El Gestor me ordenó habilitar las opciones finales **")
         
         # Asegurar que el frame de acciones esté visible
@@ -335,38 +310,39 @@ class PantallaGestionRegistroResultadoRevisionManual(tk.Frame):
         
     def tomarSeleccionConfirmacion(self):
         """
-        NOTA DE TARJETA VIOLETA:
-        Procesa la confirmación del evento como sismo válido.
+        SEGÚN DIAGRAMA: :AnalistaEnSismos → :PantallaGestionRegistroResultradoRevisionManual: tomarSeleccionConfirmacion()
+        (Aunque en el diagrama no aparece explícitamente, es parte del flujo lógico)
         """
         if messagebox.askyesno("Confirmar Evento", "¿Está seguro de que desea CONFIRMAR este evento como sismo válido?"):
+            print("** PANTALLA: tomarSeleccionConfirmacion() **")
             print("** PANTALLA: Usuario confirmó el evento **")
             self.gestor.tomarSeleccionConfirmacion()
 
     def tomarSeleccionRechazo(self):
         """
-        NOTA DE TARJETA VIOLETA:
-        Procesa el rechazo del evento (falso positivo).
-        Solicita confirmación antes de proceder.
+        SEGÚN DIAGRAMA: :AnalistaEnSismos → :PantallaGestionRegistroResultradoRevisionManual: tomarSeleccionRechazo()
+        LUEGO: :PantallaGestionRegistroResultradoRevisionManual: → GestorRegistroResultradoRevisionManual: tomarSeleccionRechazo()
         """
         if messagebox.askyesno("Confirmar Rechazo", "¿Está seguro de que desea RECHAZAR la revisión?"):
+            print("** PANTALLA: tomarSeleccionRechazo() **")
             print("** PANTALLA: Usuario confirmó el rechazo **")
+            
+            # SEGÚN DIAGRAMA: enviar la selección de rechazo al gestor
             self.gestor.tomarSeleccionRechazo()
 
     def tomarSeleccionDerivacion(self):
-        """
-        NOTA DE TARJETA VIOLETA:
-        Procesa la derivación del evento a un experto.
-        """
+        """Procesa la derivación del evento a un experto."""
         if messagebox.askyesno("Derivar a Experto", "¿Está seguro de que desea derivar este evento a un experto?"):
+            print("** PANTALLA: tomarSeleccionDerivacion() **")
             print("** PANTALLA: Usuario confirmó la derivación **")
             self.gestor.tomarSeleccionDerivacion()
 
     def finCU(self):
         """
-        NOTA DE TARJETA AZUL:
-        Finaliza el caso de uso actual.
+        CORRECCIÓN: Finaliza el caso de uso según el diagrama
         Resetea la selección y recarga la lista de eventos.
         """
+        print("** PANTALLA: finCU() **")
         print("** PANTALLA: Finalizando caso de uso **")
         
         # Resetear la selección

@@ -56,13 +56,16 @@ class EventoSismico:
     
     def estaEnEstadoAutoDetectado(self) -> bool:
         """
-        Verifica si el evento está en estado Auto-Detectado.
-        Según el diagrama: EventoSismico → :CambioEstado: *esEstadoActual() (iterando estados del evento)
+        CORRECCIÓN: Verifica si el evento está en estado Auto-Detectado.
+        SEGÚN EL DIAGRAMA: EventoSismico → :CambioEstado: *esEstadoActual() (iterando estados del evento)
+        LUEGO: :EventoSismico → estadoActual:CambioEstado: esAutoDetectado()
         """
         print(f"-> EventoSismico {self.id_sismo}: estaEnEstadoAutoDetectado()")
         
+        # CORRECCIÓN: Según las anotaciones del PDF, primero verificar si esEstadoActual()
+        # Iterando estados del evento para encontrar el estado actual
         for cambio_estado in self.historial_estados:
-            if cambio_estado.esEstadoActual():
+            if cambio_estado.esEstadoActual():  # Chequeo si fechaHoraFin está en None
                 resultado = cambio_estado.esAutoDetectado()
                 print(f"-> EventoSismico {self.id_sismo}: estaEnEstadoAutoDetectado() = {resultado}")
                 return resultado
@@ -71,19 +74,24 @@ class EventoSismico:
 
     def estaEnEstadoPendienteDeRevision(self) -> bool:
         """
-        Verifica si el evento está en estado Pendiente de Revisión.
-        Según el diagrama: EventoSismico → estadoActual:CambioEstado: esPendienteDeRevision()
+        CORRECCIÓN: Verifica si el evento está en estado Pendiente de Revisión.
+        SEGÚN EL DIAGRAMA: EventoSismico → estadoActual:CambioEstado: esPendienteDeRevision()
+        LUEGO: estadoActual:CambioEstado → estadoActual:CambioEstado: esDelAmbito()
         """
-        print(f"-> EventoSismico {self.id_sismo}: estaEnEstadoPendienteDeRevisiÃ³n()")
+        print(f"-> EventoSismico {self.id_sismo}: estaEnEstadoPendienteDeRevision()")
         
-        resultado = self.estadoActual.esPendienteDeRevision()
-        print(f"-> EventoSismico {self.id_sismo}: estaEnEstadoPendienteDeRevisiÃ³n() = {resultado}")
-        return resultado
+        # CORRECCIÓN: Verificar primero si es el estado actual vigente
+        if self.estadoActual.esEstadoActual():
+            resultado = self.estadoActual.esPendienteDeRevision()
+            print(f"-> EventoSismico {self.id_sismo}: estaEnEstadoPendienteDeRevision() = {resultado}")
+            return resultado
+        
+        return False
 
     def sosBloqueadoEnRevision(self) -> bool:
         """Verifica si el evento está bloqueado en revisión"""
         resultado = self.estadoActual.actual.nombre == "Bloqueado en Revisión"
-        print(f"-> EventoSismico {self.id_sismo}: sosBloqueadoEnRevisiÃ³n() = {resultado}")
+        print(f"-> EventoSismico {self.id_sismo}: sosBloqueadoEnRevision() = {resultado}")
         return resultado
 
     # === MÉTODOS DE CAMBIO DE ESTADO ===
@@ -121,10 +129,19 @@ class EventoSismico:
 
     def cambiarEstadoEventoSismicoABloqueadoEnRevision(self):
         """
-        Cambia el estado del evento a Bloqueado en Revisión.
-        Esto previene que otros usuarios trabajen con el mismo evento.
+        SEGÚN EL DIAGRAMA: seleccionado:EventoSismico: → estadoActual:CambioEstado: setFechHoraFin()
+        LUEGO: seleccionado:EventoSismico → seleccionado:EventoSismico: crearCambioEstado()
+        FINALMENTE: seleccionado:EventoSismico → BloqueadoEnRevision:CambioEstado : new()
         """
+        print(f"-> EventoSismico {self.id_sismo}: cambiarEstadoEventoSismicoABloqueadoEnRevision()")
         self.cambiarEstadoEventoSismico("Bloqueado en Revisión")
+
+    def cambiarEventoSismicoSeleccionadoARechazado(self):
+        """
+        CORRECCIÓN: Método específico para rechazo según el diagrama
+        """
+        print(f"-> EventoSismico {self.id_sismo}: cambiarEventoSismicoSeleccionadoARechazado()")
+        self.cambiarEstadoEventoSismico("Rechazado")
 
     def cambiarEventoSismicoARechazado(self):
         """
@@ -144,8 +161,9 @@ class EventoSismico:
     
     def getDatosEventoSismico(self) -> dict:
         """
-        Obtener datos básicos del evento sísmico.
-        Según el diagrama, debe llamar a múltiples métodos getter.
+        SEGÚN EL DIAGRAMA: :EventoSismico: → :EventoSismico:
+        getFechaHoraOcurrencia(), getLatitudEpicentro(), getLongitudEpicentro(),
+        getLatitudHipocentro(), getLongitudHipocentro(), getValorMagnitud()
         """
         print(f"-> EventoSismico {self.id_sismo}: getDatosEventoSismico()")
         
@@ -169,13 +187,11 @@ class EventoSismico:
     def getLatitudHipocentro(self) -> float:
         """Obtener latitud del hipocentro (punto de origen bajo tierra)"""
         print(f"-> EventoSismico {self.id_sismo}: getLatitudHipocentro()")
-        # Valor simulado para efectos del diagrama
         return -31.4301  # Coordenadas de ejemplo (más profundo que epicentro)
 
     def getLongitudHipocentro(self) -> float:
         """Obtener longitud del hipocentro (punto de origen bajo tierra)"""
         print(f"-> EventoSismico {self.id_sismo}: getLongitudHipocentro()")
-        # Valor simulado para efectos del diagrama
         return -64.1988  # Coordenadas de ejemplo (más profundo que epicentro)
 
     def getFechaHoraOcurrencia(self) -> datetime:
@@ -191,26 +207,36 @@ class EventoSismico:
     def getLatitudEpicentro(self) -> float:
         """Obtener latitud del epicentro (punto en superficie)"""
         print(f"-> EventoSismico {self.id_sismo}: getLatitudEpicentro()")
-        # Valor simulado para efectos del diagrama
         return -31.4201  # Coordenadas de ejemplo (Córdoba, Argentina)
 
     def getLongitudEpicentro(self) -> float:
         """Obtener longitud del epicentro (punto en superficie)"""
         print(f"-> EventoSismico {self.id_sismo}: getLongitudEpicentro()")
-        # Valor simulado para efectos del diagrama
         return -64.1888  # Coordenadas de ejemplo (Córdoba, Argentina)
 
     # === MÉTODOS DE DATOS SÍSMICOS ===
     
     def getDatosSismicosRegistradosParaEventoSismicoSeleccionado(self):
         """
-        Buscar y cargar datos sísmicos registrados para el evento.
-        Carga alcance, clasificación y origen del sismo.
+        SEGÚN EL DIAGRAMA:
+        seleccionado:EventoSismico: → :AlcanceSismo: getDatosAlcance()
+        seleccionado:EventoSismico → :ClasificacionSismo: getDatosClasificacion()
+        seleccionado:EventoSismico → :OrigenDeGeneracion: getDatosOrigen()
         """
         print(f"-> EventoSismico {self.id_sismo}: getDatosSismicosRegistradosParaEventoSismicoSeleccionado()")
-        self.alcance = AlcanceSismo().getDatosAlcance()
-        self.clasificacion = ClasificacionSismo().getDatosClasificacion()
-        self.origen = OrigenDeGeneracion().getDatosOrigen()
+        
+        # Obtener datos de alcance
+        alcance_obj = AlcanceSismo()
+        self.alcance = alcance_obj.getDatosAlcance()
+        
+        # Obtener datos de clasificación  
+        clasificacion_obj = ClasificacionSismo()
+        self.clasificacion = clasificacion_obj.getDatosClasificacion()
+        
+        # Obtener datos de origen
+        origen_obj = OrigenDeGeneracion()
+        self.origen = origen_obj.getDatosOrigen()
+        
         return self
 
     def getAlcance(self):
@@ -232,8 +258,10 @@ class EventoSismico:
     
     def validarDatosSismo(self):
         """
-        Validar datos del sismo según el diagrama.
-        Verifica alcance, magnitud y origen.
+        SEGÚN EL DIAGRAMA:
+        seleccionado:EventoSismico: →seleccionado:EventoSismico: getAlcance()
+        seleccionado:EventoSismico: →seleccionado:EventoSismico: getMagnitud()
+        seleccionado:EventoSismico: →seleccionado:EventoSismico: getOrigen()
         """
         print(f"-> EventoSismico {self.id_sismo}: validarDatosSismo()")
         
@@ -247,8 +275,6 @@ class EventoSismico:
         origen = self.getOrigen()
         
         # Aquí se podrían agregar validaciones específicas
-        # Por ejemplo: magnitud > 0, alcance no nulo, etc.
-        
         return True
 
     def getMagnitud(self) -> float:
@@ -258,8 +284,9 @@ class EventoSismico:
 
     def esDeEstacionSismologica(self) -> bool:
         """
-        Verificar si el evento fue detectado por una estación sismológica.
-        Retorna True si hay datos de estación asociados.
+        SEGÚN EL DIAGRAMA:
+        seleccionado:EventoSismico → seleccionado:EventoSismico: esDeEstacionSismologica()
+        seleccionado:EventoSismico → :Sismografo: *sosDeSismografo()
         """
         print(f"-> EventoSismico {self.id_sismo}: esDeEstacionSismologica()")
         # En un sistema real, verificaría si hay estaciones asociadas
@@ -267,10 +294,9 @@ class EventoSismico:
 
     def getValoresAlcanzadosPorCadaInstanteDeTiempo(self):
         """
-        Obtener valores alcanzados por cada instante de tiempo.
-        Procesa las series temporales para extraer valores en cada momento.
+        SEGÚN EL DIAGRAMA:
+        seleccionado:EventoSismico → seleccionado:EventoSismico: getValoresAlcanzadosPorCadaInstanteDeTiempo()
         """
         print(f"-> EventoSismico {self.id_sismo}: getValoresAlcanzadosPorCadaInstanteDeTiempo()")
         # Lógica para procesar valores por instante de tiempo
-        # En un sistema real, esto retornaría un diccionario con timestamp -> valores
         return True
