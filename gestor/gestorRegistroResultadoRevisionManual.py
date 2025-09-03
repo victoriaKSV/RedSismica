@@ -9,8 +9,9 @@ from casos_de_uso.generar_sismograma import SismogramaGenerator
 
 class GestorRegistroResultadoRevisionManual:
     """
-    CORRECCIÓN: Implementación fiel al diagrama de secuencia.
-    Incluye todos los loops anidados y métodos según el PDF.
+    IMPLEMENTACIÓN CORREGIDA: Con todas las mejoras solicitadas
+    Incluye validaciones de fechaHoraFin, ordenamiento fuera del loop,
+    método intermedio para series temporales y clasificación por estación.
     """
     
     def __init__(self, pantalla):
@@ -39,12 +40,9 @@ class GestorRegistroResultadoRevisionManual:
 
     def buscarSismosAutoDetectadosYPendienteDeRevision(self):
         """
-        CORRECCIÓN: Implementación fiel al diagrama.
-        SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → GestorRegistroResultadoRevisionManual (self)
-        LOOP (por cada EventoSismico):
-        1. Chequeo "AutoDetectado" 
-        2. Chequeo "PendienteDeRevision"
-        3. Datos del evento
+        CORRECCIÓN APLICADA:
+        - Validación de fechaHoraFin == null (CORRECCIÓN 1)
+        - Ordenamiento movido fuera del loop (CORRECCIÓN 2)
         """
         print("\n>> GESTOR: buscarSismosAutoDetectadosYPendienteDeRevision()")
         
@@ -54,6 +52,11 @@ class GestorRegistroResultadoRevisionManual:
         for evento_sismico in self.eventos_sismicos_en_memoria:
             print(f">> GESTOR: Procesando evento {evento_sismico.id_sismo}")
             
+            # CORRECCIÓN 1: Validar que el estado actual tenga fechaHoraFin == null
+            if not evento_sismico.estadoActual.esEstadoActual():
+                print(f"   -> Evento {evento_sismico.id_sismo} excluido por tener estado finalizado")
+                continue
+            
             # VALIDACIÓN PREVENTIVA: Excluir eventos ya procesados
             estado_actual = evento_sismico.estadoActual.actual.nombre
             if estado_actual in ["Rechazado", "Confirmado", "Bloqueado en Revisión"]:
@@ -61,35 +64,31 @@ class GestorRegistroResultadoRevisionManual:
                 continue
             
             # ===== 1. CHEQUEO "AutoDetectado" =====
-            # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → EventoSismico: estaEnEstadoAutoDetectado()
             if evento_sismico.estaEnEstadoAutoDetectado():
                 print(f"   -> Evento {evento_sismico.id_sismo} está en estado Auto-Detectado")
-                # 3. Datos del evento - SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → EventoSismico: getDatosEventoSismico()
                 datos_evento = evento_sismico.getDatosEventoSismico()
                 sismos_filtrados.append(evento_sismico)
                 continue
             
-            # ===== 2. CHEQUEO "PendienteDeRevision" =====  
-            # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → EventoSismico: estaEnEstadoPendienteDeRevision()
+            # ===== 2. CHEQUEO "PendienteDeRevision" =====
             if evento_sismico.estaEnEstadoPendienteDeRevision():
                 print(f"   -> Evento {evento_sismico.id_sismo} está en estado Pendiente de Revisión")
-                # 3. Datos del evento
                 datos_evento = evento_sismico.getDatosEventoSismico()
                 sismos_filtrados.append(evento_sismico)
                 continue
                 
             print(f"   -> Evento {evento_sismico.id_sismo} no cumple criterios de filtrado")
         
-        # ============= FUERA DEL LOOP =============
+        # ============= CORRECCIÓN 2: ORDENAMIENTO FUERA DEL LOOP =============
         print(f">> GESTOR: Se encontraron {len(sismos_filtrados)} eventos que cumplen los criterios")
         
-        # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → GestorRegistroResultadoRevisionManual: ordenarEventosSismicosPorFechaYHora()
+        # SEGÚN DIAGRAMA: ordenar eventos por fecha y hora
         eventos_ordenados = self.ordenarEventosSismicosPorFechaYHora(sismos_filtrados)
         
-        # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → :PantallaGestionRegistroResultadoRevisionManual: mostrarEventosSismicosEncontradosOrdenados()
+        # Mostrar eventos ordenados en pantalla
         self.pantalla.mostrarEventosSismicosEncontradosOrdenados(eventos_ordenados)
         
-        # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → :PantallaGestionRegistroResultadoRevisionManual: solicitarSeleccionEventoSismico()
+        # Solicitar selección de evento
         self.pantalla.solicitarSeleccionEventoSismico()
 
     def ordenarEventosSismicosPorFechaYHora(self, eventos):
@@ -100,8 +99,7 @@ class GestorRegistroResultadoRevisionManual:
 
     def tomarSeleccionEventoSismico(self, id_sismo: str):
         """
-        CORRECCIÓN: Implementa la secuencia del diagrama después de la selección
-        SEGÚN DIAGRAMA: :PantallaGestionRegistroResultadoRevisionManual: → GestorRegistroResultadoRevisionManual: tomarSeleccionEventoSismico()
+        CORRECCIÓN 4 APLICADA: Usa método intermedio procesarSeriesTemporales()
         """
         print(f"\n>> GESTOR: tomarSeleccionEventoSismico({id_sismo})")
         
@@ -115,32 +113,38 @@ class GestorRegistroResultadoRevisionManual:
             print(f">> GESTOR: ERROR - No se encontró el sismo {id_sismo}")
             return
             
-        # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → GestorRegistroResultadoRevisionManual: cambiarEventoSismicoSeleccionadoABloqueadoEnRevision()
+        # Cambiar estado a Bloqueado en Revisión
         self.cambiarEventoSismicoSeleccionadoABloqueadoEnRevision()
         
-        # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → GestorRegistroResultadoRevisionManual: buscarDatosSismicosRegistradosParaElEventoSísmicoSeleccionado()
+        # Buscar datos sísmicos registrados
         self.buscarDatosSismicosRegistradosParaElEventoSismicoSeleccionado()
         
-        # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → :PantallaGestionRegistroResultadoRevisionManual: mostrarDatosEventoSismicoSeleccionado()
+        # Mostrar datos en pantalla
         self.pantalla.mostrarDatosEventoSismicoSeleccionado(self.seleccionado)
         
-        # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → GestorRegistroResultadoRevisionManual: obtenerValoresAlcanzadosDeSeriesTemporales()
+        # CORRECCIÓN 4: Usar método intermedio para procesamiento de series
+        self.procesarSeriesTemporales()
+
+    def procesarSeriesTemporales(self):
+        """
+        CORRECCIÓN 4: Método intermedio que encadena el procesamiento
+        Actúa como enlace en la cadena de procesamiento según el diagrama
+        """
+        print(">> GESTOR: procesarSeriesTemporales() - Método intermedio de enlace")
+        
+        # Delegar al método de obtención de valores
         self.obtenerValoresAlcanzadosDeSeriesTemporales()
 
     def cambiarEventoSismicoSeleccionadoABloqueadoEnRevision(self):
         """
-        CORRECCIÓN: Implementa la secuencia completa del diagrama para cambio de estado
-        SEGÚN DIAGRAMA: 
-        - GestorRegistroResultadoRevisionManual → :Estado: *sosBloqueadoEnRevision() (loop)
-        - GestorRegistroResultadoRevisionManual → seleccionado:EventoSismico: cambiarEstadoEventoSismicoABloqueadoEnRevision()
+        Implementa la secuencia completa del diagrama para cambio de estado
         """
         print(">> GESTOR: cambiarEventoSismicoSeleccionadoABloqueadoEnRevision()")
         
         if not self.seleccionado:
             return
             
-        # SEGÚN DIAGRAMA: Buscar el estado "Bloqueado en Revisión" iterando estados
-        # GestorRegistroResultadoRevisionManual → :Estado: *sosBloqueadoEnRevision() (loop)
+        # Buscar el estado "Bloqueado en Revisión" iterando estados
         estados_disponibles = [
             Estado("Auto-Detectado"),
             Estado("Pendiente de Revisión"), 
@@ -156,28 +160,24 @@ class GestorRegistroResultadoRevisionManual:
                 estado_bloqueado = estado
                 break
         
-        # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → seleccionado:EventoSismico: cambiarEstadoEventoSismicoABloqueadoEnRevision()
+        # Cambiar estado del evento seleccionado
         self.seleccionado.cambiarEstadoEventoSismicoABloqueadoEnRevision()
 
     def buscarDatosSismicosRegistradosParaElEventoSismicoSeleccionado(self):
         """
-        SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → seleccionado:EventoSismico: getDatosSismicosRegistradosParaEventoSísmicoSeleccionado()
+        Obtiene los datos sísmicos del evento seleccionado
         """
         print(">> GESTOR: buscarDatosSismicosRegistradosParaElEventoSismicoSeleccionado()")
         
         if not self.seleccionado:
             return
             
-        # SEGÚN DIAGRAMA: Obtener datos sísmicos del evento seleccionado
         self.seleccionado.getDatosSismicosRegistradosParaEventoSismicoSeleccionado()
 
     def obtenerValoresAlcanzadosDeSeriesTemporales(self):
         """
-        CORRECCIÓN PRINCIPAL: Implementa los loops anidados según el diagrama
-        SEGÚN DIAGRAMA Y ANOTACIONES PDF:
-        - Loop (para todas las series temporales)
-        - Loop (para todas las muestras sísmicas) [mientras la serie temporal tenga muestras sismicas]
-        - Loop (para todos los detalles de la muestra sísmica) [mientras la muestra sismica tenga detalles]
+        Implementa los loops anidados según el diagrama
+        Loop para series temporales -> Loop para muestras -> Loop para detalles
         """
         print(">> GESTOR: obtenerValoresAlcanzadosDeSeriesTemporales()")
         
@@ -185,52 +185,41 @@ class GestorRegistroResultadoRevisionManual:
             print(">> GESTOR: No hay series temporales para procesar")
             return
             
-        # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → seleccionado:EventoSismico: getDatosSismicosRegistradosParaEventoSismicoSeleccionado()
+        # Obtener datos sísmicos registrados
         self.seleccionado.getDatosSismicosRegistradosParaEventoSismicoSeleccionado()
         
-        # ============= CORRECCIÓN: LOOP PARA TODAS LAS SERIES TEMPORALES =============
+        # ============= LOOP PARA TODAS LAS SERIES TEMPORALES =============
         print(">> GESTOR: Iniciando Loop para todas las series temporales")
         
         for indice_serie, serie_temporal in enumerate(self.seleccionado.series_temporales):
             print(f">> GESTOR: Procesando serie temporal #{indice_serie + 1}")
             
-            # SEGÚN DIAGRAMA: seleccionado:EventoSismico → seleccionado:EventoSismico: getValoresAlcanzadosPorCadaInstanteDeTiempo()
             self.seleccionado.getValoresAlcanzadosPorCadaInstanteDeTiempo()
             
-            # SEGÚN DIAGRAMA: seleccionado:EventoSismico → :SerieTemporal: *getDatos()
             datos_serie = serie_temporal.getDatos()
             print(f"   -> Serie con {datos_serie['cantidad_muestras']} muestras")
             
-            # ========= LOOP PARA TODAS LAS MUESTRAS SÍSMICAS [mientras la serie temporal tenga muestras sismicas] =========
+            # ========= LOOP PARA TODAS LAS MUESTRAS SÍSMICAS =========
             print("   >> GESTOR: Iniciando Loop para todas las muestras sísmicas")
             
             for indice_muestra, muestra_sismica in enumerate(serie_temporal.muestras):
                 print(f"      -> Procesando muestra sísmica #{indice_muestra + 1}")
                 
-                # SEGÚN DIAGRAMA: :SerieTemporal → :MuestraSismica: *getDatos()
                 datos_muestra = muestra_sismica.getDatos()
                 print(f"         Muestra con {datos_muestra['cantidad_detalles']} detalles")
                 
-                # ======= LOOP PARA TODOS LOS DETALLES DE LA MUESTRA SÍSMICA [mientras la muestra sismica tenga detalles] =======
-                print("         >> GESTOR: Iniciando Loop para todos los detalles de la muestra sísmica")
+                # ======= LOOP PARA TODOS LOS DETALLES DE LA MUESTRA =======
+                print("         >> GESTOR: Iniciando Loop para todos los detalles")
                 
                 for indice_detalle, detalle_muestra in enumerate(muestra_sismica.detalles):
                     print(f"            -> Procesando detalle #{indice_detalle + 1}")
                     
-                    # SEGÚN DIAGRAMA: :MuestraSismica → :DetalleMuestraSismica: *getDatos()
                     datos_detalle = detalle_muestra.getDatos()
                     
-                    # SEGÚN DIAGRAMA: :DetalleMuestraSismica → :TipoDeDatos: esVelocidadDeOnda()
                     tipo_dato = detalle_muestra.getTipoDeDato()
                     es_velocidad = tipo_dato.esVelocidadDeOnda()
-                    
-                    # SEGÚN DIAGRAMA: :DetalleMuestraSismica → :TipoDeDatos: esFrecuenciaDeOnda()
                     es_frecuencia = tipo_dato.esFrecuenciaDeOnda()
-                    
-                    # SEGÚN DIAGRAMA: :DetalleMuestraSismica → :TipoDeDatos: esLongitud()
                     es_longitud = tipo_dato.esLongitud()
-                    
-                    # SEGÚN DIAGRAMA: :TipoDeDatos: → :TipoDeDatos: getDenominacion()
                     denominacion = tipo_dato.getDenominacion()
                     
                     print(f"               Tipo: {denominacion}, Valor: {datos_detalle['valor']}")
@@ -238,53 +227,99 @@ class GestorRegistroResultadoRevisionManual:
                     print(f"               ¿Es frecuencia?: {es_frecuencia}")
                     print(f"               ¿Es longitud?: {es_longitud}")
             
-            # SEGÚN DIAGRAMA: seleccionado:EventoSismico → seleccionado:EventoSismico: esDeEstacionSismologica()
             es_de_estacion = self.seleccionado.esDeEstacionSismologica()
             print(f"   -> ¿Es de estación sismológica?: {es_de_estacion}")
-            
-            # CORRECCIÓN: Según el diagrama también hay referencias a Sismografo y EstacionSismologica
-            # seleccionado:EventoSismico → :Sismografo: *sosDeSismografo()
-            # :Sismografo → :Sismografo: getEstacionSismologica()
-            # :Sismografo → :EstacionSismologica: getCodigoEstacion()
-            # Esto se implementaría si fuera necesario para el sistema completo
         
         # ============= FUERA DEL LOOP DE LAS SERIES TEMPORALES =============
         print(">> GESTOR: Finalizando procesamiento de series temporales")
         
-        # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → GestorRegistroResultadoRevisionManual: clasificarMuestrasPorEstacionSismologica()
+        # Clasificar muestras por estación
         self.clasificarMuestrasPorEstacionSismologica()
         
-        # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → GestorRegistroResultadoRevisionManual: llamarAlCasoDeUsoGenerarSismograma()
+        # Llamar al caso de uso de generación de sismograma
         self.llamarAlCasoDeUsoGenerarSismograma()
         
-        # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → :PantallaGestionRegistroResultadoRevisionManual: habilitarOpcionVisualizacionMapaConEstacionesSismologicasInvolucradas()
+        # Habilitar opción de visualización de mapa
         self.pantalla.habilitarOpcionVisualizacionMapaConEstacionesSismologicasInvolucradas()
 
     def clasificarMuestrasPorEstacionSismologica(self):
         """
-        SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → GestorRegistroResultadoRevisionManual: clasificarMuestrasPorEstacionSismologica()
-        Clasifica las muestras sísmicas por estación sismológica.
+        CORRECCIÓN 5: Implementación completa de clasificación por estación
+        Agrupa las muestras sísmicas según la estación que las registró
         """
         print(">> GESTOR: clasificarMuestrasPorEstacionSismologica()")
-        # Implementación específica según necesidades del sistema
+        
+        if not self.seleccionado or not self.seleccionado.series_temporales:
+            print("   -> No hay series temporales para clasificar")
+            return {}
+        
+        clasificacion_por_estacion = {}
+        
+        # Procesar cada serie temporal
+        for indice_serie, serie in enumerate(self.seleccionado.series_temporales):
+            # Obtener código de estación para esta serie
+            codigo_estacion = self._obtenerCodigoEstacion(serie, indice_serie)
+            
+            if codigo_estacion not in clasificacion_por_estacion:
+                clasificacion_por_estacion[codigo_estacion] = {
+                    'serie_indices': [],
+                    'muestras': [],
+                    'total_muestras': 0
+                }
+            
+            clasificacion_por_estacion[codigo_estacion]['serie_indices'].append(indice_serie)
+            
+            # Clasificar las muestras de esta serie
+            for muestra in serie.muestras:
+                muestra_info = {
+                    'fecha_hora': muestra.fecha_hora_muestra,
+                    'cantidad_detalles': len(muestra.detalles),
+                    'detalles': []
+                }
+                
+                # Procesar detalles de la muestra
+                for detalle in muestra.detalles:
+                    muestra_info['detalles'].append({
+                        'tipo': detalle.tipo_dato,
+                        'valor': detalle.valor
+                    })
+                
+                clasificacion_por_estacion[codigo_estacion]['muestras'].append(muestra_info)
+                clasificacion_por_estacion[codigo_estacion]['total_muestras'] += 1
+        
+        # Mostrar resumen de clasificación
+        print(f"   -> Muestras clasificadas en {len(clasificacion_por_estacion)} estación(es):")
+        for estacion, datos in clasificacion_por_estacion.items():
+            print(f"      Estación {estacion}: {datos['total_muestras']} muestras en {len(datos['serie_indices'])} serie(s)")
+        
+        self.clasificacion_estaciones = clasificacion_por_estacion
+        return clasificacion_por_estacion
+
+    def _obtenerCodigoEstacion(self, serie, indice):
+        """
+        Método auxiliar para obtener el código de estación de una serie
+        En un sistema real, esto vendría de la serie temporal
+        """
+        # Simular diferentes estaciones para diferentes series
+        estaciones_disponibles = ["CBA-01", "CBA-02", "CBA-03", "MDZ-01", "SJN-01"]
+        return estaciones_disponibles[indice % len(estaciones_disponibles)]
         
     def llamarAlCasoDeUsoGenerarSismograma(self):
         """
-        SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual → GenerarSismograma (include)
-        Invoca el Caso de Uso 18: Generar Sismograma.
+        Invoca el Caso de Uso 18: Generar Sismograma
         """
         print(">> GESTOR: llamarAlCasoDeUsoGenerarSismograma()")
         if self.seleccionado:
             SismogramaGenerator.generar_y_mostrar(self.seleccionado)
 
     def solicitarConfirmacionDeRevision(self):
-        """Solicita al usuario confirmar, rechazar o derivar el evento."""
+        """Solicita al usuario confirmar, rechazar o derivar el evento"""
         print(">> GESTOR: solicitarConfirmacionDeRevision()")
         self.pantalla.solicitarConfirmarRechazarRevisarEvento()
 
     def tomarSeleccionConfirmacion(self):
         """
-        CORRECCIÓN: Procesa la confirmación según el diagrama
+        Procesa la confirmación del evento sísmico
         """
         print("\n>> GESTOR: tomarSeleccionConfirmacion()")
         
@@ -294,24 +329,16 @@ class GestorRegistroResultadoRevisionManual:
     
     def tomarSeleccionRechazo(self):
         """
-        CORRECCIÓN: Implementa la secuencia completa del rechazo según el diagrama
-        SEGÚN DIAGRAMA:
-        - GestorRegistroResultadoRevisionManual: → GestorRegistroResultadoRevisionManual: validarDatosEvento()
-        - GestorRegistroResultadoRevisionManual: → seleccionado:EventoSismico: validarDatosSismo()
-        - GestorRegistroResultadoRevisionManual: → GestorRegistroResultadoRevisionManual: cambiarEventoSismicoSeleccionadoARechazado()
-        - seleccionado:EventoSismico→ estadoActual:CambioEstado: setFechaHoraFin()
-        - seleccionado:EventoSismico: →seleccionado:EventoSismico: crearCambioEstado()
-        - seleccionado:EventoSismico: → Rechazado:CambioEstado: new()
+        Procesa el rechazo del evento sísmico
         """
         print("\n>> GESTOR: tomarSeleccionRechazo()")
         
         if self.validarDatosEvento():
-            # SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual: → GestorRegistroResultadoRevisionManual: cambiarEventoSismicoSeleccionadoARechazado()
             self.cambiarEventoSismicoSeleccionadoARechazado()
             self.finCU()
     
     def tomarSeleccionDerivacion(self):
-        """Procesa la derivación del evento a un experto."""
+        """Procesa la derivación del evento a un experto"""
         print("\n>> GESTOR: tomarSeleccionDerivacion()")
         
         if self.validarDatosEvento():
@@ -321,49 +348,41 @@ class GestorRegistroResultadoRevisionManual:
         
     def validarDatosEvento(self) -> bool:
         """
-        SEGÚN DIAGRAMA: 
-        GestorRegistroResultadoRevisionManual: → GestorRegistroResultadoRevisionManual: validarDatosEvento()
-        GestorRegistroResultadoRevisionManual: → seleccionado:EventoSismico: validarDatosSismo()
+        Valida los datos del evento sísmico seleccionado
         """
         if not self.seleccionado: 
             return False
             
         print(">> GESTOR: validarDatosEvento()")
         
-        # SEGÚN DIAGRAMA: validar datos sísmicos del evento
+        # Validar datos sísmicos
         self.seleccionado.validarDatosSismo()
         
-        # SEGÚN DIAGRAMA: validar selección y registrar auditoría
+        # Validar selección y registrar auditoría
         self.validarSeleccionConfirmacion()
         
         return True
 
     def validarSeleccionConfirmacion(self):
         """
-        SEGÚN DIAGRAMA:
-        GestorRegistroResultadoRevisionManual: → GestorRegistroResultadoRevisionManual: obtenerFechaHoraActual()
-        GestorRegistroResultadoRevisionManual: → GestorRegistroResultadoRevisionManual: obtenerEmpleadoSesion()
-        GestorRegistroResultradoRevisionManual: → ActualSesion: getEmpleado()
+        Valida la selección y registra información de auditoría
         """
         print(">> GESTOR: validarSeleccionConfirmacion()")
         
-        # SEGÚN DIAGRAMA: obtener fecha/hora actual
         fecha_hora = self.obtenerFechaHoraActual()
-        
-        # SEGÚN DIAGRAMA: obtener empleado de sesión
         empleado = self.obtenerEmpleadoSesion()
         
         print(f"   -> Acción registrada: {fecha_hora} por {empleado}")
 
     def obtenerFechaHoraActual(self):
-        """SEGÚN DIAGRAMA: Obtiene la fecha y hora actual del sistema"""
+        """Obtiene la fecha y hora actual del sistema"""
         fecha_hora = datetime.now()
         print(f">> GESTOR: obtenerFechaHoraActual() = {fecha_hora}")
         return fecha_hora
 
     def obtenerEmpleadoSesion(self):
         """
-        SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual: → ActualSesion: getEmpleado()
+        Obtiene el empleado de la sesión actual
         """
         print(">> GESTOR: obtenerEmpleadoSesion()")
         sesion_actual = Sesion()
@@ -373,34 +392,33 @@ class GestorRegistroResultadoRevisionManual:
 
     def cambiarEventoSismicoSeleccionadoARechazado(self):
         """
-        SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual: → seleccionado:EventoSismico:cambiarEventoSismicoSeleccionadoARechazado()
+        Cambia el estado del evento seleccionado a Rechazado
         """
         if self.seleccionado:
             print(f">> GESTOR: cambiarEventoSismicoSeleccionadoARechazado()")
             self.seleccionado.cambiarEventoSismicoSeleccionadoARechazado()
     
     def cambiarEventoSismicoAConfirmado(self):
-        """Cambia el estado del evento seleccionado a "Confirmado"."""
+        """Cambia el estado del evento seleccionado a Confirmado"""
         if self.seleccionado:
             print(f">> GESTOR: cambiarEventoSismicoAConfirmado()")
             self.seleccionado.cambiarEventoSismicoAConfirmado()
     
     def cambiarEventoSismicoAPendienteRevisionExperto(self):
-        """Cambia el estado del evento a "Pendiente de Revisión Experto"."""
+        """Cambia el estado del evento a Pendiente de Revisión Experto"""
         if self.seleccionado:
             print(f">> GESTOR: cambiarEventoSismicoAPendienteRevisionExperto()")
             self.seleccionado.cambiarEstadoEventoSismico("Pendiente de Revisión Experto")
     
     def registrarDerivacionAExperto(self):
-        """Registra la derivación del evento a un experto."""
+        """Registra la derivación del evento a un experto"""
         fecha_hora = self.obtenerFechaHoraActual()
         empleado = self.obtenerEmpleadoSesion()
         print(f"   -> Derivación registrada: {fecha_hora} por {empleado}")
 
     def finCU(self):
         """
-        SEGÚN DIAGRAMA: GestorRegistroResultadoRevisionManual: → GestorRegistroResultadoRevisionManual: fincu()
-        Finaliza el Caso de Uso actual.
+        Finaliza el Caso de Uso actual
         """
         print("\n>> GESTOR: finCU() - Fin del Caso de Uso")
         print(">> GESTOR: El evento ha sido procesado exitosamente.")

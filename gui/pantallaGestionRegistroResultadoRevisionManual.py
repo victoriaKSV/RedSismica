@@ -297,16 +297,28 @@ class PantallaGestionRegistroResultadoRevisionManual(tk.Frame):
 
     def solicitarConfirmarRechazarRevisarEvento(self):
         """
-        SEGÚN DIAGRAMA: GestorRegistroResultradoRevisionManual → :PantallaGestionRegistroResultradoRevisionManual: solicitarConfirmarRechazarRevisarEvento()
+        CORRECCIÓN 7: Método ajustado según diagrama de secuencia
+        Este método debe solo mostrar las opciones en pantalla sin llamar al gestor
         """
         print("** PANTALLA: solicitarConfirmarRechazarRevisarEvento() **")
-        print("** PANTALLA: El Gestor me ordenó habilitar las opciones finales **")
-        
-        # Asegurar que el frame de acciones esté visible
+        print("** PANTALLA: Mostrando opciones de confirmación/rechazo/derivación **")
+    
+        # Solo mostrar las opciones en la interfaz
         self.frame_acciones.pack_forget()
         self.frame_acciones.pack(pady=10, padx=10, fill="x")
-        
-        messagebox.showinfo("Acción Requerida", "Por favor, seleccione una acción final para el evento.")
+    
+        # Habilitar todos los botones de acción
+        self.btn_confirmar.config(state="normal")
+        self.btn_rechazar.config(state="normal")
+        self.btn_derivar.config(state="normal")
+    
+        messagebox.showinfo(
+            "Acción Requerida", 
+            "Por favor, seleccione una acción final para el evento:\n" +
+            "- Confirmar: Validar como sismo real\n" +
+            "- Rechazar: Marcar como falso positivo\n" +
+            "- Derivar: Solicitar revisión de experto"
+        )
         
     def tomarSeleccionConfirmacion(self):
         """

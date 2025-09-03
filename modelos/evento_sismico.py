@@ -10,32 +10,30 @@ from .serie_temporal import SerieTemporal
 from .muestra_sismica import MuestraSismica
 from .detalle_muestra_sismica import DetalleMuestraSismica
 
+# CORRECCIÓN 3: modelos/evento_sismico.py
+# Agregar atributo fechaHoraFin al EventoSismico
+
 class EventoSismico:
-    """
-    NOTA IMPORTANTE (de tarjeta amarilla):
-    ======================================
-    El EventoSismico maneja los cambios de estado mediante:
-    - Un estado actual (CambioEstado)
-    - Un historial completo de estados
-    - Cada cambio registra fecha/hora de inicio y fin
-    - Los estados válidos son: Auto-Detectado, Pendiente de Revisión,
-      Bloqueado en Revisión, Confirmado, Rechazado
-    """
-    
     def __init__(self, id_sismo: str, fecha: datetime, magnitud: float, estado_inicial: str = "Auto-Detectado", series_data=None):
         self.id_sismo = id_sismo
         self.fechaHoraOcurrencia = fecha
+        self.fechaHoraFin = None  # CORRECCIÓN 3: Nuevo atributo
         self.valorMagnitud = magnitud
         self.estadoActual = CambioEstado(Estado(estado_inicial))
         self.historial_estados = [self.estadoActual]
         self.alcance = None
         self.clasificacion = None
         self.origen = None
-        
-        # Cargar la estructura de series temporales
         self.series_temporales = self._cargar_series(series_data)
         
         print(f"-> Creada instancia de EventoSismico ID: {self.id_sismo} en estado '{estado_inicial}'")
+
+    def setFechaHoraFin(self, fecha_hora=None):
+        """Establece la fecha/hora de finalización del evento sísmico"""
+        if fecha_hora is None:
+            fecha_hora = datetime.now()
+        self.fechaHoraFin = fecha_hora
+        print(f"-> EventoSismico {self.id_sismo}: fechaHoraFin establecida a {self.fechaHoraFin}")
 
     def _cargar_series(self, series_data):
         """Carga las series temporales desde los datos proporcionados"""
